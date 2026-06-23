@@ -1,0 +1,312 @@
+bash
+
+cat /tmp/index_pwa.html
+Salida
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fila Taxi 10">
+<meta name="theme-color" content="#1a6b47">
+<link rel="manifest" href="manifest.json">
+<title>Monitor Fila — Móvil 10</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #f5f5f0; color: #1a1a1a;
+  min-height: 100vh; -webkit-tap-highlight-color: transparent;
+}
+#app { max-width: 420px; margin: 0 auto; padding: 0 0 2rem; }
+.topbar {
+  background: #1a6b47; padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.topbar-title { font-size: 16px; font-weight: 600; color: white; }
+.topbar-sub { font-size: 12px; color: rgba(255,255,255,0.75); }
+.status-chip {
+  margin-left: auto; display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.15);
+  padding: 5px 11px; border-radius: 20px;
+}
+.status-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+.status-chip .dot.active { background: #86efac; animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.main-card {
+  margin: 16px 16px 12px; background: #fff;
+  border-radius: 18px; border: 1px solid #e8e8e4;
+  padding: 30px 20px 26px; text-align: center;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.main-card.alert-on {
+  border: 2px solid #ef4444;
+  animation: pulse-card 1.2s ease-in-out infinite;
+}
+@keyframes pulse-card {
+  0%,100%{ box-shadow: 0 0 0 4px rgba(239,68,68,0.1); }
+  50%{ box-shadow: 0 0 0 10px rgba(239,68,68,0.03); }
+}
+.card-label { font-size: 13px; color: #999; margin-bottom: 14px; }
+.pos-number {
+  font-size: 100px; font-weight: 700; line-height: 1;
+  color: #ccc; transition: color 0.4s; letter-spacing: -4px;
+}
+.pos-number.safe   { color: #16a34a; }
+.pos-number.near   { color: #d97706; }
+.pos-number.danger { color: #ef4444; }
+.card-sub { font-size: 13px; color: #aaa; margin-top: 12px; }
+
+.alert-banner {
+  display: none; margin: 0 16px 12px;
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-radius: 12px; padding: 14px 16px; text-align: center;
+}
+.alert-banner.visible { display: block; }
+.alert-title { font-size: 15px; font-weight: 600; color: #dc2626; margin-bottom: 3px; }
+.alert-sub { font-size: 12px; color: #ef4444; }
+
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px 12px; }
+.stat { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: 14px 16px; text-align: center; }
+.stat .s-label { font-size: 11px; color: #aaa; margin-bottom: 4px; }
+.stat .s-value { font-size: 22px; font-weight: 600; }
+
+.section { background: #fff; border: 1px solid #e8e8e4; border-radius: 16px; margin: 0 16px 12px; overflow: hidden; }
+.section-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f0ec; gap: 12px; }
+.section-row:last-child { border-bottom: none; }
+.row-label { font-size: 14px; color: #444; flex: 1; }
+.row-label small { display: block; font-size: 11px; color: #bbb; margin-top: 2px; }
+.num-stepper { display: flex; align-items: center; gap: 6px; }
+.step-btn { width: 32px; height: 32px; border: 1px solid #ddd; background: #fafafa; border-radius: 8px; font-size: 20px; cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; }
+.step-btn:active { background: #eee; }
+input[type=number] { width: 58px; text-align: center; font-size: 18px; font-weight: 700; padding: 6px 4px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; color: #1a1a1a; -moz-appearance: textfield; }
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type=range] { flex: 1; accent-color: #1a6b47; }
+.range-val { font-size: 13px; font-weight: 600; color: #1a6b47; min-width: 38px; text-align: right; }
+
+.btn-primary { display: block; width: calc(100% - 32px); margin: 0 16px 10px; background: #1a6b47; color: white; border: none; border-radius: 14px; padding: 17px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary.stop { background: #dc2626; }
+.btn-secondary { display: block; width: calc(100% - 32px); margin: 0 16px 16px; background: transparent; color: #666; border: 1px solid #ddd; border-radius: 14px; padding: 13px; font-size: 14px; cursor: pointer; }
+.btn-secondary:active { background: #f0f0ec; }
+
+.log-box { margin: 0 16px; background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; overflow-y: auto; max-height: 170px; }
+.log-entry { font-size: 12px; font-family: 'Courier New',monospace; color: #999; padding: 7px 12px; border-bottom: 1px solid #f5f5f0; }
+.log-entry:last-child { border-bottom: none; }
+.log-entry.ok   { color: #16a34a; }
+.log-entry.err  { color: #dc2626; }
+.log-entry.warn { color: #d97706; }
+.footer { text-align: center; padding: 1rem 16px 0; font-size: 11px; color: #ccc; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">🚕 Móvil 10 · Fila</div>
+      <div class="topbar-sub">Taxis Aeropuerto</div>
+    </div>
+    <div class="status-chip">
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text">Inactivo</span>
+    </div>
+  </div>
+
+  <div class="main-card" id="main-card">
+    <div class="card-label">Posición actual del móvil 10</div>
+    <div class="pos-number" id="pos-num">—</div>
+    <div class="card-sub" id="card-sub">Sin datos aún</div>
+  </div>
+
+  <div class="alert-banner" id="alert-banner">
+    <div class="alert-title">⚠️ ¡Alerta! Móvil 10 en puesto <span id="alert-pos">—</span></div>
+    <div class="alert-sub">Alarma sonando · repite cada 5 segundos</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="s-label">Última consulta</div><div class="s-value" id="last-check">—</div></div>
+    <div class="stat"><div class="s-label">Total en fila</div><div class="s-value" id="total-fila">—</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-row">
+      <div class="row-label">🔔 Alertar si posición ≤<small>Puesto mínimo para alarma</small></div>
+      <div class="num-stepper">
+        <button class="step-btn" onclick="stepT(-1)">−</button>
+        <input type="number" id="threshold" value="6" min="1" max="99">
+        <button class="step-btn" onclick="stepT(1)">+</button>
+      </div>
+    </div>
+    <div class="section-row">
+      <div class="row-label">⏱ Actualizar cada<small>Frecuencia de consulta</small></div>
+      <input type="range" id="interval" min="10" max="120" step="10" value="30">
+      <span class="range-val" id="interval-out">30s</span>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="btn-start" onclick="toggleMonitor()">▶ Iniciar monitoreo</button>
+  <button class="btn-secondary" onclick="testSound()">🔊 Probar sonido de alerta</button>
+
+  <div class="log-box" id="log-box">
+    <div class="log-entry">Listo. Tocá "Iniciar monitoreo" para comenzar.</div>
+  </div>
+  <div class="footer">taxis.hosting.servimatica.com.uy</div>
+</div>
+
+<script>
+var monitorInterval = null;
+var audioCtx = null;
+var alarmActive = false;
+var alarmInterval = null;
+var MOVIL = 10;
+var AJAX_URL = 'https://taxis.hosting.servimatica.com.uy/fila/ajax/fila.php';
+var PROXIES = [
+  'https://api.allorigins.win/get?url=',
+  'https://corsproxy.io/?',
+  'https://thingproxy.freeboard.io/fetch/'
+];
+var checkCount = 0;
+
+function stepT(d) {
+  var el = document.getElementById('threshold');
+  el.value = Math.max(1, Math.min(99, parseInt(el.value) + d));
+}
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function beep(freq, dur, vol) {
+  try {
+    var ctx = getAudio();
+    if (ctx.state === 'suspended') ctx.resume();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq; osc.type = 'sine';
+    gain.gain.setValueAtTime(vol||0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + dur);
+  } catch(e){}
+}
+function playAlert() {
+  beep(880,0.25,0.6); setTimeout(function(){ beep(1100,0.25,0.6); },300);
+  setTimeout(function(){ beep(880,0.25,0.6); },600); setTimeout(function(){ beep(1320,0.6,0.6); },900);
+}
+function testSound() { try { getAudio().resume(); } catch(e){} playAlert(); addLog('Probando sonido...','ok'); }
+function startAlarm(pos) {
+  if (alarmActive) return; alarmActive = true;
+  playAlert(); alarmInterval = setInterval(playAlert, 5000);
+  document.getElementById('alert-banner').classList.add('visible');
+  document.getElementById('alert-pos').textContent = pos;
+  document.getElementById('main-card').classList.add('alert-on');
+}
+function stopAlarm() {
+  if (!alarmActive) return; alarmActive = false;
+  clearInterval(alarmInterval); alarmInterval = null;
+  document.getElementById('alert-banner').classList.remove('visible');
+  document.getElementById('main-card').classList.remove('alert-on');
+}
+function addLog(msg, type) {
+  var box = document.getElementById('log-box');
+  var now = new Date().toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  var div = document.createElement('div');
+  div.className = 'log-entry'+(type?' '+type:'');
+  div.textContent = '['+now+'] '+msg;
+  box.insertBefore(div, box.firstChild);
+  while (box.children.length > 60) box.removeChild(box.lastChild);
+}
+function updateDisplay(pos, total) {
+  var el = document.getElementById('pos-num');
+  var sub = document.getElementById('card-sub');
+  var thr = parseInt(document.getElementById('threshold').value)||6;
+  if (pos === null) { el.className='pos-number'; el.textContent='?'; sub.textContent='Móvil '+MOVIL+' no encontrado'; stopAlarm(); return; }
+  el.textContent = pos; sub.textContent = 'de '+total+' en fila';
+  if (pos <= thr) { el.className='pos-number danger'; startAlarm(pos); }
+  else if (pos <= thr+4) { el.className='pos-number near'; stopAlarm(); }
+  else { el.className='pos-number safe'; stopAlarm(); }
+}
+function parseHtml(html) {
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(html, 'text/html');
+  var cards = doc.querySelectorAll('.card-body');
+  var pos = null, total = 0;
+  cards.forEach(function(card) {
+    var strongs = card.querySelectorAll('strong');
+    if (strongs.length >= 2) {
+      total++;
+      var posicion = parseInt(strongs[0].textContent.trim());
+      var movil = parseInt(strongs[1].textContent.trim());
+      if (movil === MOVIL) pos = posicion;
+    }
+  });
+  return { pos: pos, total: total };
+}
+async function tryProxy(proxyUrl, targetUrl) {
+  var url = proxyUrl + encodeURIComponent(targetUrl);
+  var resp = await fetch(url, {cache:'no-store'});
+  if (!resp.ok) throw new Error('HTTP '+resp.status);
+  var ct = resp.headers.get('content-type')||'';
+  if (ct.includes('json')) { var d = await resp.json(); return d.contents||d.body||''; }
+  return await resp.text();
+}
+async function checkFila() {
+  checkCount++;
+  var now = new Date().toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('last-check').textContent = now;
+  var html = null;
+  for (var i = 0; i < PROXIES.length; i++) {
+    try {
+      html = await tryProxy(PROXIES[(checkCount + i) % PROXIES.length], AJAX_URL);
+      if (html && html.length > 20) break;
+    } catch(e) { html = null; }
+  }
+  if (!html) { addLog('Error: todos los proxies fallaron','err'); return; }
+  var result = parseHtml(html);
+  document.getElementById('total-fila').textContent = result.total||'?';
+  var thr = parseInt(document.getElementById('threshold').value)||6;
+  if (result.pos !== null) {
+    addLog('Móvil '+MOVIL+' → puesto '+result.pos+'/'+result.total, result.pos<=thr?'warn':'ok');
+    updateDisplay(result.pos, result.total);
+  } else if (result.total > 0) {
+    addLog('Móvil '+MOVIL+' no está en fila ('+result.total+' móviles)','warn');
+    updateDisplay(null, result.total);
+  } else {
+    addLog('Sin datos en la respuesta','err');
+  }
+}
+function toggleMonitor() {
+  var btn = document.getElementById('btn-start');
+  var dot = document.getElementById('status-dot');
+  var stxt = document.getElementById('status-text');
+  try { getAudio().resume(); } catch(e){}
+  if (monitorInterval) {
+    clearInterval(monitorInterval); monitorInterval = null; stopAlarm();
+    btn.innerHTML='▶ Iniciar monitoreo'; btn.classList.remove('stop');
+    dot.classList.remove('active'); stxt.textContent='Inactivo';
+    addLog('Detenido.','');
+  } else {
+    var secs = parseInt(document.getElementById('interval').value)||30;
+    checkFila();
+    monitorInterval = setInterval(checkFila, secs*1000);
+    btn.innerHTML='⏹ Detener monitoreo'; btn.classList.add('stop');
+    dot.classList.add('active'); stxt.textContent='Cada '+secs+'s';
+    addLog('Iniciado · cada '+secs+'s','ok');
+  }
+}
+document.getElementById('interval').addEventListener('input', function(){
+  var v=this.value; document.getElementById('interval-out').textContent=v+'s';
+  if (monitorInterval) { clearInterval(monitorInterval); monitorInterval=setInterval(checkFila,parseInt(v)*1000); document.getElementById('status-text').textContent='Cada '+v+'s'; }
+});
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+document.addEventListener('touchstart', function wake(){ try { getAudio().resume(); } catch(e){} document.removeEventListener('touchstart', wake); },{once:true});
+</script>
+</body>
+</html>
+
+
+
+
