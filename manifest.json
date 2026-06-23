@@ -1,0 +1,22 @@
+{
+  "name": "Fila Taxi 10",
+  "short_name": "Taxi 10",
+  "description": "Monitor de posición en fila de taxis",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a6b47",
+  "theme_color": "#1a6b47",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/1a6b47/ffffff?text=T10",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/1a6b47/ffffff?text=T10",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+Guardá con "Commit changes" y decime cuando esté listo.
