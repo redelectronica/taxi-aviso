@@ -16,7 +16,7 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile --ignore-scripts
       - name: Build
         working-directory: artifacts/mobile
         run: eas build --platform android --profile preview --non-interactive
