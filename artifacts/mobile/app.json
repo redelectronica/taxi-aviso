@@ -1,0 +1,72 @@
+{
+  "expo": {
+    "name": "Monitor de Fila",
+    "slug": "alarma-lista",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "mobile",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.redelectronica.monitorfila",
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://replit.com/"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#FFD000",
+          "defaultChannel": "alarm",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-background-fetch",
+        {}
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "17e55acc-6b75-4183-800a-eaf72446b908"
+      }
+    },
+    "owner": "redelectronicas-team"
+  }
+}

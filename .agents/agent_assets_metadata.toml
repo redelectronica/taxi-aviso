@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "M2VwpyXvPFipTDRMzAJnK"
+uri = "file://attached_assets/generated_audio/alarm.mp3"
+type = "audio"
+title = "taxi alarm"
