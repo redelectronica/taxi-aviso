@@ -17,7 +17,7 @@ jobs:
         run: npm install -g eas-cli
       - name: Install dependencies
         working-directory: artifacts/mobile
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile && pnpm approve-builds --all
       - name: Build
         working-directory: artifacts/mobile
         run: eas build --platform android --profile preview --non-interactive
