@@ -29,7 +29,9 @@
         "android.permission.VIBRATE",
         "android.permission.USE_EXACT_ALARM",
         "android.permission.POST_NOTIFICATIONS",
-        "android.permission.WAKE_LOCK"
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_DATA_SYNC"
       ]
     },
     "web": {
@@ -56,7 +58,8 @@
       [
         "expo-background-fetch",
         {}
-      ]
+      ],
+      "@voximplant/react-native-foreground-service"
     ],
     "experiments": {
       "typedRoutes": true,
