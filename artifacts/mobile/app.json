@@ -59,8 +59,7 @@
         "expo-background-fetch",
         {}
       ],
-      "@voximplant/react-native-foreground-service",
-      "./plugins/withForegroundService"
+     
     ],
     "experiments": {
       "typedRoutes": true,
