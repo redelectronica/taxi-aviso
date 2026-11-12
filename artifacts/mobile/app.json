@@ -58,8 +58,7 @@
       [
         "expo-background-fetch",
         {}
-      ],
-     
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
