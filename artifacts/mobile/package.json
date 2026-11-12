@@ -62,6 +62,6 @@
     "expo-notifications": "~0.32.17",
     "expo-task-manager": "~14.0.9",
     "react-native-webview": "13.15.0",
-    "@voximplant/react-native-foreground-service": "^2.2.1"
+   "@voximplant/react-native-foreground-service": "^3.0.2"
   }
 }
